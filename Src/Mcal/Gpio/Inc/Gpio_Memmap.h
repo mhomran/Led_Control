@@ -16,11 +16,26 @@
  *********************************************************************************************************************/
 #include "Std_Types.h"
 #include "Gpio_Types.h"
+#include "Mcu_Hw.h"
 
 /**********************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
  *********************************************************************************************************************/
 
+#define GPIOA_BASE                0x40058000
+#define GPIOB_BASE                0x40059000
+
+#define GPIO_DATA_OS              0x3FC
+#define GPIO_DIR_OS               0x400
+#define GPIO_AFSEL_OS             0x420
+#define GPIO_CTL_OS               0x52C
+#define GPIO_EN_OS                0x51C
+
+#define GPIO_DATA(base, bit)      BITBAND(base+GPIO_DATA_OS, bit)            
+#define GPIO_DIR(base, bit)       BITBAND(base+GPIO_DIR_OS, bit)            
+#define GPIO_AFSEL(base, bit)     BITBAND(base+GPIO_AFSEL_OS, bit)            
+#define GPIO_CTL(base, bit)       BITBAND(base+GPIO_CTL_OS, bit)  
+#define GPIO_EN(base, bit)       BITBAND(base+GPIO_EN_OS, bit)  
 
 /**********************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -30,7 +45,6 @@
 /**********************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
  *********************************************************************************************************************/
-
 
 /**********************************************************************************************************************
  *  GLOBAL DATA PROTOTYPES

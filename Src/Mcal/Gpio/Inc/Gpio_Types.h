@@ -47,9 +47,22 @@ typedef enum
 */
 typedef enum
 {
-  /* TODO: Populate this list based on available MCU pins */
-  PORTA_0,
-  PORTA_1,
+  PA0,
+  PA1,
+  PA2,
+  PA3,
+  PA4,
+  PA5,
+  PA6,
+  PA7,
+  PB0,
+  PB1,
+  PB2,
+  PB3,
+  PB4,
+  PB5,
+  PB6,
+  PB7,
   GPIO_CHANNEL_MAX
 } GpioChannel_t;
 
@@ -59,7 +72,8 @@ typedef enum
 typedef enum 
 {
   GPIO_DIR_INPUT, 
-  GPIO_DIR_OUTPUT
+  GPIO_DIR_OUTPUT,
+  GPIO_DIR_MAX
 } GpioDirection_t;
 
 #endif  /* GPIO_TYPES_H */

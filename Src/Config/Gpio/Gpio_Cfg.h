@@ -39,7 +39,7 @@ typedef struct
 	GpioChannel_t Channel; /**< The I/O pin */
 	GpioDirection_t Direction; /**< OUTPUT or INPUT */
 	GpioState_t Data; /**< HIGH or LOW */
-}GpioConfig_t;
+} GpioConfig_t;
 
  
 #endif  /* GPIO_CFG_H */

@@ -14,19 +14,23 @@
 #include "Std_Types.h"
 #include "Gpio.h"
 #include "Gpio_Memmap.h"
+#include "Gpio_Cfg.h"
 
 /**********************************************************************************************************************
 *  LOCAL MACROS CONSTANT\FUNCTION
 *********************************************************************************************************************/	
+#define PORT_PINS_NUM         8
 
+#define ARR_SIZE(x) (sizeof(x)/sizeof(x[0]))
 /**********************************************************************************************************************
  *  LOCAL DATA 
  *********************************************************************************************************************/
-
+static uint32 gBaseAddresses[] = { GPIOA_BASE, GPIOB_BASE };
 /**********************************************************************************************************************
  *  GLOBAL DATA
  *********************************************************************************************************************/
-
+extern const GpioConfig_t gGpioConfig[];
+extern const uint8 gGpioConfigSize;
 /**********************************************************************************************************************
  *  LOCAL FUNCTION PROTOTYPES
  *********************************************************************************************************************/
@@ -53,7 +57,24 @@
 *******************************************************************************/
 void Gpio_Init(void)
 {
-  /* STUP */
+  uint8 i, j;
+  uint8 baseIdx;
+  uint8 bit;
+
+  for(i = 0; i < gGpioConfigSize; i++) 
+    {
+      baseIdx = gGpioConfig[i].Channel % ARR_SIZE(gBaseAddresses);
+      bit = gGpioConfig[i].Channel % PORT_PINS_NUM; 
+
+      GPIO_DIR(gBaseAddresses[baseIdx], bit) = gGpioConfig[i].Direction;
+      GPIO_AFSEL(gBaseAddresses[baseIdx], bit) = 0;
+      GPIO_EN(gBaseAddresses[baseIdx], bit) = 1;
+      for(j = 0; j < 4; j++) 
+        {
+          GPIO_CTL(gBaseAddresses[baseIdx], j+bit*4) = 0;
+        }
+      GPIO_DATA(gBaseAddresses[baseIdx], bit) = gGpioConfig[i].Data;
+    }
 }
 
 
@@ -74,7 +95,12 @@ void Gpio_Init(void)
 *******************************************************************************/
 void Gpio_ChannelWrite(GpioChannel_t Channel, GpioState_t State)
 {
-  /* STUP */
+  uint8 baseIdx;
+  uint8 bit;
+  baseIdx = Channel % ARR_SIZE(gBaseAddresses);
+  bit = Channel % PORT_PINS_NUM; 
+
+  GPIO_DATA(gBaseAddresses[baseIdx], bit) = State;
 }
 
 /******************************************************************************
@@ -91,7 +117,12 @@ void Gpio_ChannelWrite(GpioChannel_t Channel, GpioState_t State)
 *******************************************************************************/
 void Gpio_SetChannelDirection(GpioChannel_t Channel, GpioDirection_t Direction)
 {
-  /* STUP */
+  uint8 baseIdx;
+  uint8 bit;
+  baseIdx = Channel % ARR_SIZE(gBaseAddresses);
+  bit = Channel % PORT_PINS_NUM; 
+
+  GPIO_DIR(gBaseAddresses[baseIdx], bit) = Direction;
 }
 
 /**********************************************************************************************************************
