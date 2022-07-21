@@ -1,12 +1,10 @@
 /**********************************************************************************************************************
  *  FILE DESCRIPTION
  *  -----------------------------------------------------------------------------------------------------------------*/
-/**        \file  main.c
- *        \brief  Control blinking of an LED for a user-defined ON and OFF periods
+/**        \file  IntCtrl.c
+ *        \brief  General purpose input/output Driver
  *
- *      \details  Users can input a specific ON time and OFF time in seconds, 
- *                lights a LED for the given ON time, and dim itfor the given OFF
- *                time. 
+ *      \details  The Driver Configures MCU INT_CTRL pins.
  *
  *********************************************************************************************************************/
 
@@ -14,12 +12,15 @@
  *  INCLUDES
  *********************************************************************************************************************/
 #include "Std_Types.h"
-#include "Gpio.h"
 #include "IntCtrl.h"
+#include "IntCtrl_Memmap.h"
+
 /**********************************************************************************************************************
 *  LOCAL MACROS CONSTANT\FUNCTION
-*********************************************************************************************************************/
+*********************************************************************************************************************/	
+#define PORT_PINS_NUM         8
 
+#define ARR_SIZE(x) (sizeof(x)/sizeof(x[0]))
 /**********************************************************************************************************************
  *  LOCAL DATA 
  *********************************************************************************************************************/
@@ -35,41 +36,52 @@
 /**********************************************************************************************************************
  *  LOCAL FUNCTIONS
  *********************************************************************************************************************/
-void TIMER0A_Handler(void);
+
 /**********************************************************************************************************************
  *  GLOBAL FUNCTIONS
  *********************************************************************************************************************/
 
 
 /******************************************************************************
-* \Syntax          : int main(void)        
-* \Description     : The entry point of the program                                   
+* \Syntax          : void IntCtrl_EnableIRQ(IRQn_t IRQn)                                      
+* \Description     : Enable External Interrupt                                  
 *                                                                             
 * \Sync\Async      : Synchronous                                               
 * \Reentrancy      : Reentrant                                             
-* \Parameters (in) : None            
+* \Parameters (in) : IRQn  IRQn_t External interrupt number. 
+                                     Value cannot be negative.
 * \Parameters (out): None                                                      
-* \Return value:   : int             SUCCESS
-*                                    FAILURE                                  
+* \Return value:   : None
 *******************************************************************************/
-int main(void)
+void 
+IntCtrl_EnableIRQ(IRQn_t IRQn)
 {
-	Gpio_Init();
-	IntCtrl_EnableIRQ(TIM0A_IRQn);
-	IntCtrl_SetPendingIRQ(TIM0A_IRQn);
-	
-	while(1) 
-    {
-      /* STUP */
-    }
+  uint32 regn = IRQn / 32;
+  uint32 bitn = IRQn & 0x1FUL;
+  NVIC->ISER[regn] = (1UL << bitn);
 }
 
-void TIMER0A_Handler(void) {
-	int x, y;
-	x = 3;
-	y = x + 2;
+
+/******************************************************************************
+* \Syntax          : void IntCtrl_SetPendingIRQ(IRQn_t IRQn)                                      
+* \Description     : Sets the pending bit of an external interrupt.                               
+*                                                                             
+* \Sync\Async      : Synchronous                                               
+* \Reentrancy      : Reentrant                                             
+* \Parameters (in) : IRQn  IRQn_t External interrupt number. 
+                                     Value cannot be negative.
+* \Parameters (out): None                                                      
+* \Return value:   : None
+*******************************************************************************/
+void 
+IntCtrl_SetPendingIRQ(IRQn_t IRQn)
+{
+  uint32 regn = IRQn / 32;
+  uint32 bitn = IRQn & 0x1FUL;
+  NVIC->ISPR[regn] = (1UL << bitn);
 }
+
 
 /**********************************************************************************************************************
- *  END OF FILE: main.c
+ *  END OF FILE: IntCtrl.c
  *********************************************************************************************************************/
