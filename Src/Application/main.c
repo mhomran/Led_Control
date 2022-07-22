@@ -25,7 +25,7 @@
 /**********************************************************************************************************************
  *  LOCAL DATA 
  *********************************************************************************************************************/
-
+static uint32 gOnTime, gOffTime, gOnVal, gOffVal;
 /**********************************************************************************************************************
  *  GLOBAL DATA
  *********************************************************************************************************************/
@@ -38,6 +38,7 @@
  *  LOCAL FUNCTIONS
  *********************************************************************************************************************/
 void App_Callback(void);
+void App_Blink(uint32 OnTime, uint32 OffTime);
 /**********************************************************************************************************************
  *  GLOBAL FUNCTIONS
  *********************************************************************************************************************/
@@ -71,7 +72,8 @@ int main(void)
 	Gpt_Init();
 	Gpt_LoadSet(TIMER_0, 1000000);
 	Gpt_SetCallback(TIMER_0, App_Callback);
-	Gpt_StartTimer(TIMER_0);
+	
+	App_Blink(1, 3);
 	while(1) 
     {
       /* STUP */
@@ -81,11 +83,53 @@ int main(void)
 void 
 App_Callback(void)
 {
-	static int i = 0;
-	
+	static uint8 turn = 1;
+
+	if (turn)
+		{
+			Gpio_ChannelWrite(PF0, GPIO_STATE_HIGH);
+			/* The load value can't be covered by the timer */
+			if ((gOnVal * (1000000ul)) > (0x0FFFFFFFul))
+				{
+					Gpt_LoadSet(TIMER_0, (1000000ul));
+					gOnVal--; /* Decrease number of ON seconds. */
+				}
+			else
+				{
+					Gpt_LoadSet(TIMER_0, (gOnVal * (1000000ul)));
+					turn = 1-turn;
+					gOffVal = gOffTime;
+				}
+		}
+	else 
+		{
+			Gpio_ChannelWrite(PF0, GPIO_STATE_LOW);
+			/* The load value can't be covered by the timer */
+			if ((gOffVal * (1000000ul)) > (0x0FFFFFFFul))
+				{
+					Gpt_LoadSet(TIMER_0, (1000000ul));
+					gOffVal--; /* Decrease number of OFF seconds. */
+				}
+			else
+				{
+					Gpt_LoadSet(TIMER_0, (gOffVal * (1000000ul)));
+					turn = 1-turn;
+					gOnVal = gOnTime;
+				}
+		}
+
 	Gpt_StartTimer(TIMER_0);
-	Gpio_ChannelWrite(PF0, 1-i);
-	i = 1-i;
+}
+
+void 
+App_Blink(uint32 OnTime, uint32 OffTime)
+{
+	Gpt_StopTimer(TIMER_0);
+	gOnTime = OnTime;
+	gOnVal = OnTime;
+	gOffTime = OffTime;
+	gOffVal = OffTime;
+	App_Callback();
 }
 
 /**********************************************************************************************************************

@@ -96,9 +96,17 @@ Gpt_LoadSet(GptChannel_t Channel, uint32 Value)
 void 
 Gpt_StartTimer(GptChannel_t Channel)
 {
-  /* disable the timer. */
+  /* Enable the timer. */
   GPT_CTL(gBaseAddresses[Channel], GPT_CTL_TAEN) = 1;
   GPT_CTL(gBaseAddresses[Channel], GPT_CTL_TBEN) = 1;
+}
+
+void 
+Gpt_StopTimer(GptChannel_t Channel)
+{
+  /* disable the timer. */
+  GPT_CTL(gBaseAddresses[Channel], GPT_CTL_TAEN) = 0;
+  GPT_CTL(gBaseAddresses[Channel], GPT_CTL_TBEN) = 0;
 }
 
 void 

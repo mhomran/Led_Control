@@ -47,6 +47,7 @@ extern "C"{
 
 void Gpt_Init(void);
 void Gpt_StartTimer(GptChannel_t Channel);
+void Gpt_StopTimer(GptChannel_t Channel);
 void Gpt_LoadSet(GptChannel_t Channel, uint32 Value);
 void Gpt_SetCallback(GptChannel_t Channel, void (*Callback)(void));
 
