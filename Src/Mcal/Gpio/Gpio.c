@@ -25,7 +25,14 @@
 /**********************************************************************************************************************
  *  LOCAL DATA 
  *********************************************************************************************************************/
-static uint32 gBaseAddresses[] = { GPIOA_BASE, GPIOB_BASE };
+static uint32 gBaseAddresses[] = { 
+  GPIOA_BASE, 
+  GPIOB_BASE,
+  GPIOC_BASE,
+  GPIOD_BASE,
+  GPIOE_BASE,
+  GPIOF_BASE
+  };
 /**********************************************************************************************************************
  *  GLOBAL DATA
  *********************************************************************************************************************/
@@ -63,7 +70,7 @@ void Gpio_Init(void)
 
   for(i = 0; i < gGpioConfigSize; i++) 
     {
-      baseIdx = gGpioConfig[i].Channel % ARR_SIZE(gBaseAddresses);
+      baseIdx = gGpioConfig[i].Channel / PORT_PINS_NUM;
       bit = gGpioConfig[i].Channel % PORT_PINS_NUM; 
 
       GPIO_DIR(gBaseAddresses[baseIdx], bit) = gGpioConfig[i].Direction;
@@ -97,7 +104,7 @@ void Gpio_ChannelWrite(GpioChannel_t Channel, GpioState_t State)
 {
   uint8 baseIdx;
   uint8 bit;
-  baseIdx = Channel % ARR_SIZE(gBaseAddresses);
+  baseIdx = Channel / PORT_PINS_NUM;
   bit = Channel % PORT_PINS_NUM; 
 
   GPIO_DATA(gBaseAddresses[baseIdx], bit) = State;
@@ -119,7 +126,7 @@ void Gpio_SetChannelDirection(GpioChannel_t Channel, GpioDirection_t Direction)
 {
   uint8 baseIdx;
   uint8 bit;
-  baseIdx = Channel % ARR_SIZE(gBaseAddresses);
+  baseIdx = Channel / PORT_PINS_NUM;
   bit = Channel % PORT_PINS_NUM; 
 
   GPIO_DIR(gBaseAddresses[baseIdx], bit) = Direction;

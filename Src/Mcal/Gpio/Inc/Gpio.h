@@ -59,7 +59,8 @@ extern "C"{
 void Gpio_Init(void);
 
 /******************************************************************************
-* \Syntax          : void Gpio_Init(void)                                      
+* \Syntax          : void Gpio_ChannelWrite(GpioChannel_t Channel, 
+GpioState_t State);
 * \Description     : This function is used to write the state of a channel 
 *                    (pin) as either logic high or low through the use of  
 *                    the GpioChannel_t enum to select the channel
@@ -76,7 +77,8 @@ void Gpio_Init(void);
 void Gpio_ChannelWrite(GpioChannel_t Channel, GpioState_t State);
 
 /******************************************************************************
-* \Syntax          : void Gpio_Init(void)                                      
+* \Syntax          :Gpio_SetChannelDirection(GpioChannel_t Channel, 
+GpioDirection_t Direction);                                     
 * \Description     : This function is used to set the direction of a channel.                             
 *                                                                             
 * \Sync\Async      : Synchronous                                               

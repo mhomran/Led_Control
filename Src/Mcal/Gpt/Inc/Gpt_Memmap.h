@@ -2,48 +2,58 @@
 
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------
- *         File:  Gpio_Memmap.h
- *       Module:  Gpio
+ *         File:  Gpt_Memmap.h
+ *       Module:  Gpt
  *
- *  Description:  header file for Gpio memmory map    
+ *  Description:  header file for Gpt memmory map    
  *  
  *********************************************************************************************************************/
-#ifndef GPIO_MEMMAP_H
-#define GPIO_MEMMAP_H
+#ifndef GPT_MEMMAP_H
+#define GPT_MEMMAP_H
 
 /**********************************************************************************************************************
  * INCLUDES
  *********************************************************************************************************************/
 #include "Std_Types.h"
-#include "Gpio_Types.h"
+#include "Gpt_Types.h"
 #include "Mcu_Hw.h"
 
 /**********************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
  *********************************************************************************************************************/
 
-#define GPIOA_BASE                0x40058000
-#define GPIOB_BASE                0x40059000
-#define GPIOC_BASE                0x4005A000
-#define GPIOD_BASE                0x4005B000
-#define GPIOE_BASE                0x4005C000
-#define GPIOF_BASE                0x4005D000
-
-#define GPIO_DATA_OS              0x3FC
-#define GPIO_DIR_OS               0x400
-#define GPIO_AFSEL_OS             0x420
-#define GPIO_CTL_OS               0x52C
-#define GPIO_EN_OS                0x51C
-
-#define GPIO_DATA(base, bit)      BITBAND(base+GPIO_DATA_OS, bit)            
-#define GPIO_DIR(base, bit)       BITBAND(base+GPIO_DIR_OS, bit)            
-#define GPIO_AFSEL(base, bit)     BITBAND(base+GPIO_AFSEL_OS, bit)            
-#define GPIO_CTL(base, bit)       BITBAND(base+GPIO_CTL_OS, bit)  
-#define GPIO_EN(base, bit)       BITBAND(base+GPIO_EN_OS, bit)  
-
 /**********************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
  *********************************************************************************************************************/
+
+#define TIM0_BASE                0x40030000
+
+#define GPT_CFG_OS               0x000
+#define GPT_TAMR_OS              0x004
+#define GPT_TBMR_OS              0x008
+#define GPT_CTL_OS               0x00C
+#define GPT_IMR_OS               0x018
+#define GPT_ICR_OS               0x024
+#define GPT_TAILR_OS             0x028
+#define GPT_TBILR_OS             0x02C
+
+#define GPT_CFG(base, bit)      BITBAND(base+GPT_CFG_OS,bit)
+#define GPT_TAMR(base, bit)     BITBAND(base+GPT_TAMR_OS,bit)
+#define GPT_TBMR(base, bit)     BITBAND(base+GPT_TBMR_OS,bit)
+#define GPT_CTL(base, bit)      BITBAND(base+GPT_CTL_OS,bit)
+#define GPT_IMR(base, bit)      BITBAND(base+GPT_IMR_OS,bit)
+#define GPT_ICR(base)          *(volatile uint32*)(base+GPT_ICR_OS)
+#define GPT_TAILR(base)        *(volatile uint32*)(base+GPT_TAILR_OS)
+#define GPT_TBILR(base)        *(volatile uint32*)(base+GPT_TBILR_OS)
+
+#define GPT_CTL_TAEN  0
+#define GPT_CTL_TBEN  8
+#define GPT_TAMR_TAMR_0 0
+#define GPT_TAMR_TAMR_1 1
+#define GPT_TAMR_TACDIR 4
+#define GPT_IMR_TATOIM 0
+
+
 
 
 /**********************************************************************************************************************
@@ -53,14 +63,13 @@
 /**********************************************************************************************************************
  *  GLOBAL DATA PROTOTYPES
  *********************************************************************************************************************/
-
  
 /**********************************************************************************************************************
  *  GLOBAL FUNCTION PROTOTYPES
  *********************************************************************************************************************/
 
-#endif  /* GPIO_MEMMAP_H */
+#endif  /* GPT_MEMMAP_H */
 
 /**********************************************************************************************************************
- *  END OF FILE: Gpio_Memmap.h
+ *  END OF FILE: Gpt_Memmap.h
  *********************************************************************************************************************/

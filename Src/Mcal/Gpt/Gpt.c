@@ -1,12 +1,10 @@
 /**********************************************************************************************************************
  *  FILE DESCRIPTION
  *  -----------------------------------------------------------------------------------------------------------------*/
-/**        \file  main.c
- *        \brief  Control blinking of an LED for a user-defined ON and OFF periods
+/**        \file  Gpt.c
+ *        \brief  General purpose input/output Driver
  *
- *      \details  Users can input a specific ON time and OFF time in seconds, 
- *                lights a LED for the given ON time, and dim itfor the given OFF
- *                time. 
+ *      \details  The Driver Configures MCU General purpose timers.
  *
  *********************************************************************************************************************/
 
@@ -14,22 +12,24 @@
  *  INCLUDES
  *********************************************************************************************************************/
 #include "Std_Types.h"
-#include "Gpio.h"
-#include "IntCtrl.h"
 #include "Gpt.h"
-#include "Mcu_Hw.h"
+#include "Gpt_Memmap.h"
+
 /**********************************************************************************************************************
 *  LOCAL MACROS CONSTANT\FUNCTION
-*********************************************************************************************************************/
+*********************************************************************************************************************/	
+static uint32 gBaseAddresses[] = { TIM0_BASE };
 
+#define ARR_SIZE(x) (sizeof(x)/sizeof(x[0]))
 /**********************************************************************************************************************
  *  LOCAL DATA 
  *********************************************************************************************************************/
-
+static void (*Callbacks[6])(void);
 /**********************************************************************************************************************
  *  GLOBAL DATA
  *********************************************************************************************************************/
-
+extern const GptConfig_t gGptConfig[];
+extern const uint8 gGptConfigSize;
 /**********************************************************************************************************************
  *  LOCAL FUNCTION PROTOTYPES
  *********************************************************************************************************************/
@@ -37,57 +37,89 @@
 /**********************************************************************************************************************
  *  LOCAL FUNCTIONS
  *********************************************************************************************************************/
-void App_Callback(void);
+static void Gpt_IntClear(GptChannel_t Channel);
+
 /**********************************************************************************************************************
  *  GLOBAL FUNCTIONS
  *********************************************************************************************************************/
-
+void TIMER0A_Handler(void);
 
 /******************************************************************************
-* \Syntax          : int main(void)        
-* \Description     : The entry point of the program                                   
+* \Syntax          : void Gpt_Init(void)                                   
+* \Description     : This function is used to initialize timers.                                  
 *                                                                             
 * \Sync\Async      : Synchronous                                               
 * \Reentrancy      : Reentrant                                             
-* \Parameters (in) : None            
+* \Parameters (in) : Config  GptConfig_t* the configuration structure.                     
 * \Parameters (out): None                                                      
-* \Return value:   : int             SUCCESS
-*                                    FAILURE                                  
+* \Return value:   : None
 *******************************************************************************/
-int main(void)
+void 
+Gpt_Init(void)
 {
-	/*enable PORT F CLK*/
-	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R5;
-	while(!(SYSCTL_PRGPIO_R & SYSCTL_RCGCGPIO_R5));
-	/*enable Timer0 CLK*/
-	SYSCTL_RCGCTIMER_R |= SYSCTL_RCGCTIMER_R0;
-	while(!(SYSCTL_PRTIMER_R & SYSCTL_RCGCTIMER_R0));
+  uint8 i, j;
+  uint8 baseIdx;
 
-	IntCtrl_EnableIRQ(TIM0A_IRQn);
-
-	Gpio_Init();
-	Gpio_ChannelWrite(PF0, GPIO_STATE_HIGH);
-	
-	Gpt_Init();
-	Gpt_LoadSet(TIMER_0, 1000000);
-	Gpt_SetCallback(TIMER_0, App_Callback);
-	Gpt_StartTimer(TIMER_0);
-	while(1) 
+  for(i = 0; i < gGptConfigSize; i++) 
     {
-      /* STUP */
+      baseIdx = gGptConfig[i].Channel;
+      
+      /* disable the timer. */
+      GPT_CTL(gBaseAddresses[baseIdx], GPT_CTL_TAEN) = 0;
+      GPT_CTL(gBaseAddresses[baseIdx], GPT_CTL_TBEN) = 0;
+
+      /* 32 bit concatenated timer. */
+      for(j = 0; j < 4; j++) 
+        {
+          GPT_CFG(gBaseAddresses[baseIdx], j) = 0; 
+        }
+      
+      /* One-shot or periodic */
+      GPT_TAMR(gBaseAddresses[baseIdx], GPT_TAMR_TAMR_0) = gGptConfig[i].Mode & 1;
+      GPT_TAMR(gBaseAddresses[baseIdx], GPT_TAMR_TAMR_1) = (gGptConfig[i].Mode >> 1);
+
+      /* Enable Time-out interrupt */
+      GPT_IMR(gBaseAddresses[baseIdx], GPT_IMR_TATOIM) = 1;
+
+      /* Count up */
+      GPT_TAMR(gBaseAddresses[baseIdx], GPT_TAMR_TACDIR) = 1;
     }
 }
 
+
 void 
-App_Callback(void)
+Gpt_LoadSet(GptChannel_t Channel, uint32 Value)
 {
-	static int i = 0;
-	
-	Gpt_StartTimer(TIMER_0);
-	Gpio_ChannelWrite(PF0, 1-i);
-	i = 1-i;
+  GPT_TAILR(gBaseAddresses[Channel]) = Value << 4;
+}
+
+void 
+Gpt_StartTimer(GptChannel_t Channel)
+{
+  /* disable the timer. */
+  GPT_CTL(gBaseAddresses[Channel], GPT_CTL_TAEN) = 1;
+  GPT_CTL(gBaseAddresses[Channel], GPT_CTL_TBEN) = 1;
+}
+
+void 
+Gpt_SetCallback(GptChannel_t Channel, void (*Callback)(void))
+{
+  Callbacks[Channel] = Callback;
+}
+
+static void 
+Gpt_IntClear(GptChannel_t Channel)
+{
+  GPT_ICR(gBaseAddresses[Channel]) = 0xFFFF;
+}
+
+void 
+TIMER0A_Handler(void) 
+{
+  Gpt_IntClear(TIMER_0);
+	if(Callbacks[0]) Callbacks[0]();
 }
 
 /**********************************************************************************************************************
- *  END OF FILE: main.c
+ *  END OF FILE: Gpt.c
  *********************************************************************************************************************/
