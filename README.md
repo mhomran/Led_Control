@@ -1,7 +1,6 @@
 # About
 
-This repository contains an implementation of a Led Controller for Tiva C 1294 board. It contains
-implementatiom for some drivers like `NVIC`, `GPIO`, and `GPT`.
+This repository contains an implementation of a Led Controller for Tiva C 1294 board. It contains implementations for some drivers like Nested Vector Interrupt Controller (NVIC), General Purpose IO (GPIO), and General Purpose Timer (GPT).
 
 # Block Diagram
 
