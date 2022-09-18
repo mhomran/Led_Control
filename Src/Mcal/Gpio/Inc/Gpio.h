@@ -77,13 +77,13 @@ GpioState_t State);
 void Gpio_ChannelWrite(GpioChannel_t Channel, GpioState_t State);
 
 /******************************************************************************
-* \Syntax          :Gpio_SetChannelDirection(GpioChannel_t Channel, 
+* \Syntax          : void Gpio_SetChannelDirection(GpioChannel_t Channel, 
 GpioDirection_t Direction);                                     
 * \Description     : This function is used to set the direction of a channel.                             
 *                                                                             
 * \Sync\Async      : Synchronous                                               
 * \Reentrancy      : Reentrant                                             
-* \Parameters (in) : Channel     PORTX_N
+* \Parameters (in) : Channel     PXN
 *                    Direction   GPIO_DIR_INPUT
 *                                GPIO_DIR_OUTPUT           
 * \Parameters (out): None                                                      
