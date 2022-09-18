@@ -87,12 +87,33 @@ Gpt_Init(void)
 }
 
 
+/******************************************************************************
+* \Syntax          : void Gpt_LoadSet(GptChannel_t Channel, uint32 Value)                                 
+* \Description     : This function sets load value for a timer.                                  
+*                                                                             
+* \Sync\Async      : Synchronous                                               
+* \Reentrancy      : Reentrant                                             
+* \Parameters (in) : Channel  GptChannel_t the Channel Id.
+                     Value  uint32 the load value.                     
+* \Parameters (out): None                                                      
+* \Return value:   : None
+*******************************************************************************/
 void 
 Gpt_LoadSet(GptChannel_t Channel, uint32 Value)
 {
   GPT_TAILR(gBaseAddresses[Channel]) = Value << 4;
 }
 
+/******************************************************************************
+* \Syntax          : void Gpt_StartTimer(GptChannel_t Channel)
+* \Description     : This function starts a timer.                                  
+*                                                                             
+* \Sync\Async      : Synchronous                                               
+* \Reentrancy      : Reentrant                                             
+* \Parameters (in) : Channel  GptChannel_t the Channel Id.                
+* \Parameters (out): None                                                      
+* \Return value:   : None
+*******************************************************************************/
 void 
 Gpt_StartTimer(GptChannel_t Channel)
 {
@@ -101,6 +122,16 @@ Gpt_StartTimer(GptChannel_t Channel)
   GPT_CTL(gBaseAddresses[Channel], GPT_CTL_TBEN) = 1;
 }
 
+/******************************************************************************
+* \Syntax          : void Gpt_StopTimer(GptChannel_t Channel)
+* \Description     : This function stops a timer.                                  
+*                                                                             
+* \Sync\Async      : Synchronous                                               
+* \Reentrancy      : Reentrant                                             
+* \Parameters (in) : Channel  GptChannel_t the Channel Id.                
+* \Parameters (out): None                                                      
+* \Return value:   : None
+*******************************************************************************/
 void 
 Gpt_StopTimer(GptChannel_t Channel)
 {
@@ -109,18 +140,48 @@ Gpt_StopTimer(GptChannel_t Channel)
   GPT_CTL(gBaseAddresses[Channel], GPT_CTL_TBEN) = 0;
 }
 
+/******************************************************************************
+* \Syntax          : void Gpt_SetCallback(GptChannel_t Channel, 
+void (*Callback)(void))
+* \Description     : This function register a callback function for a timer.                                  
+*                                                                             
+* \Sync\Async      : Synchronous                                               
+* \Reentrancy      : Reentrant                                             
+* \Parameters (in) : Channel  GptChannel_t the Channel Id. 
+                     Callback void (*)(void) the callback function            
+* \Parameters (out): None                                                      
+* \Return value:   : None
+*******************************************************************************/
 void 
 Gpt_SetCallback(GptChannel_t Channel, void (*Callback)(void))
 {
   Callbacks[Channel] = Callback;
 }
 
+/******************************************************************************
+* \Syntax          : static void Gpt_IntClear(GptChannel_t Channel)
+* \Description     : This function clear interrupt flags for a timer.                                  
+* \Sync\Async      : Synchronous                                               
+* \Reentrancy      : Reentrant                                             
+* \Parameters (in) : Channel  GptChannel_t the Channel Id.                
+* \Parameters (out): None                                                      
+* \Return value:   : None
+*******************************************************************************/
 static void 
 Gpt_IntClear(GptChannel_t Channel)
 {
   GPT_ICR(gBaseAddresses[Channel]) = 0xFFFF;
 }
 
+/******************************************************************************
+* \Syntax          : void TIMER0A_Handler(void) 
+* \Description     : Timer 0 interrupt service handler                                 
+* \Sync\Async      : Synchronous                                               
+* \Reentrancy      : Reentrant                                             
+* \Parameters (in) : None                
+* \Parameters (out): None                                                      
+* \Return value:   : None
+*******************************************************************************/
 void 
 TIMER0A_Handler(void) 
 {
